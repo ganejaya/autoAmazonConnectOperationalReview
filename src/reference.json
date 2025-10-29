@@ -1,0 +1,20 @@
+{
+	"Recommendations": {
+		"1": {
+			"text": "Toll Free Numbers Advantage",
+			"description": "<ul><li>In the US, use toll-free phone numbers wherever possible to load balance across multiple carriers for additional route and carrier redundancy.</li><li>In situations where you use DIDs, load balance across numbers from multiple carriers, when possible, to increase reliability.</li><li>This level of service does come at an additional cost.</li></ul>"
+		},
+		"2": {
+			"text": "Toll Free Numbers DisAdvantage",
+			"description": "<ul>Though Toll free numbers provide additional resiliency, it comes with additional cost when compared with DIDs. Apply your workload's availability and resiliency requirements in choosing right telephony numbers. Refer <a href='https://docs.aws.amazon.com/connect/latest/adminguide/ag-overview-numbers.html' target='_blank'>documentation</a> for additional details on DIDs and TFNs in Amazon Connect.</ul>"
+		},
+		"3": {
+			"text": "ACGR",
+			"description": "<ul>Consider Amazon Connect Global Resiliency (ACGR) for resiliency requirements. ACGR provides customers with geographic telephony redundancy, offering a flexible solution to distribute inbound voice traffic and agents across linked instances with the same reserved capacity limit, in another Region in the event of unplanned Region outages or disruptions or other requirements. Refer <a href='https://docs.aws.amazon.com/connect/latest/adminguide/disaster-recovery-resiliency.html' target='_blank'>documentation</a> for more information</ul>"
+		},
+		"4": {
+			"text": "Contact Flows missing logging",
+			"description": "<ul>Use a Set logging behavior block to enable or disable logging for segments of the flow where sensitive information is collected and can't be stored in CloudWatch.Learn more about contact flow logging.</ul>"
+		}
+	}
+}
