@@ -1,0 +1,94 @@
+# CloudFormation template for Amazon Connect Operational Review
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for Amazon Connect Operational Review'
+
+Parameters:
+  AmazonConnectInstanceARN:
+    Type: String
+    Description: 'The ARN of your Amazon Connect instance'
+  
+  AmazonConnectCloudWatchLogGroup:
+    Type: String
+    Description: 'The ARN of your Amazon Connect instance'
+
+  AmazonS3ForReports:
+    Type: String
+    Description: 'Existing S3 Bucket ARN for uploading reports'
+    MinLength: 3
+    MaxLength: 63
+    ConstraintDescription: 'Must be a valid S3 bucket name'
+
+
+Resources:
+  # IAM Role for Lambda execution with required permissions
+  AmazonConnectOperationalReviewLambdaExecutionRole:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonConnectReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSCloudTrail_ReadOnlyAccess
+        - arn:aws:iam::aws:policy/ServiceQuotasReadOnlyAccess
+        - arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
+        
+      Policies:
+      - PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Resource: "*"
+            Action: "mobiletargeting:PhoneNumberValidate"
+            Effect: "Allow"
+            Sid: "VisualEditor0"
+        PolicyName: "PinpointPhoneNumberValidateReadOnlyAccess"
+      - PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Resource: !Sub 'arn:aws:s3:::${AmazonS3ForReports}/*'
+            Action: "s3:PutObject"
+            Effect: "Allow"
+            Sid: "VisualEditor0"
+        PolicyName: "PutObjectToS3-Review"
+
+  # Lambda function to manage Amazon Connect resources
+  LambdaFunctionAmazonConnectOperationalReviewauto:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: "amazonConnectOperationalReview-auto"
+      Handler: "lambda_function.lambda_handler"
+      Role: !GetAtt AmazonConnectOperationalReviewLambdaExecutionRole.Arn
+      Runtime: python3.9
+      Timeout: 600
+      MemorySize: 256
+      Environment:
+        Variables:
+          CONNECT_INSTANCE_ARN: !Ref AmazonConnectInstanceARN
+          CONNECT_CW_LOG_GROUP: !Ref AmazonConnectCloudWatchLogGroup
+          S3_REPORTING_BUCKET: !Ref AmazonS3ForReports
+      Code:
+        S3Bucket: operations-review-code-share 
+        S3Key: amazonConnectOperationalReview-auto.zip
+        S3ObjectVersion: nz9BDS.pYeqMmZY2VtKOMOb7liRO5xnt
+        
+  # CloudWatch Log Group for Lambda
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/lambda/amazonConnectOperationalReview-auto"
+      RetentionInDays: 30
+
+Outputs:
+  LambdaFunctionArn:
+    Description: 'ARN of the Lambda function'
+    Value: "Automated Amazon Connect Operational Review"
+  
+  LambdaFunctionName:
+    Description: 'Name of the Lambda function'
+    Value: "amazonConnectOperationalReview-auto"
