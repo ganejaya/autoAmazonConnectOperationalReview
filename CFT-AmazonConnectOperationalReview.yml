@@ -1,19 +1,37 @@
 # CloudFormation template for Amazon Connect Operational Review
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template for Amazon Connect Operational Review'
+Description: 'CloudFormation template for Amazon Connect Operational Review. Please use us-east-1 to import this template file.'
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Amazon Connect Operational Review Configuration"
+        Parameters:
+          - AmazonConnectInstanceARN
+          - AmazonConnectCloudWatchLogGroup
+          - AmazonS3ForReports
+    ParameterLabels:
+      AmazonConnectInstanceARN:
+        default: "Amazon Connnect Instance ARN"
+      AmazonConnectCloudWatchLogGroup:
+        default: "Amazon Connect CloudWatch LogGroup"
+      AmazonS3ForReports:
+        default: "Amazon S3 bucket ARN"
+      
 
 Parameters:
   AmazonConnectInstanceARN:
     Type: String
-    Description: 'The ARN of your Amazon Connect instance'
+    Description: 'The ARN of your Amazon Connect instance for this review. Example: arn:aws:connect:<region>:<account-id>:instance/<resource-id>'
   
   AmazonConnectCloudWatchLogGroup:
     Type: String
-    Description: 'The ARN of your Amazon Connect instance'
+    Description: 'The ARN of your Amazon Connect instance's CloudWatch Log Group resource. Example: /aws/connect/connect-instance-name'
 
   AmazonS3ForReports:
     Type: String
-    Description: 'Existing S3 Bucket ARN for uploading reports'
+    Description: 'Existing S3 Bucket ARN for uploading Operational review reports'
     MinLength: 3
     MaxLength: 63
     ConstraintDescription: 'Must be a valid S3 bucket name'
@@ -22,7 +40,6 @@ Parameters:
 Resources:
   # IAM Role for Lambda execution with required permissions
   AmazonConnectOperationalReviewLambdaExecutionRole:
-    UpdateReplacePolicy: "Retain"
     Type: "AWS::IAM::Role"
     Properties:
       AssumeRolePolicyDocument:
@@ -65,7 +82,7 @@ Resources:
       Handler: "lambda_function.lambda_handler"
       Role: !GetAtt AmazonConnectOperationalReviewLambdaExecutionRole.Arn
       Runtime: python3.9
-      Timeout: 600
+      Timeout: 900
       MemorySize: 256
       Environment:
         Variables:
@@ -73,9 +90,9 @@ Resources:
           CONNECT_CW_LOG_GROUP: !Ref AmazonConnectCloudWatchLogGroup
           S3_REPORTING_BUCKET: !Ref AmazonS3ForReports
       Code:
-        S3Bucket: operations-review-code-share 
+        S3Bucket: amazon-connect-operational-review-code-share
         S3Key: amazonConnectOperationalReview-auto.zip
-        S3ObjectVersion: nz9BDS.pYeqMmZY2VtKOMOb7liRO5xnt
+        S3ObjectVersion: DPI520qcEh40XudHch1eAtMyvDgtRg.D
         
   # CloudWatch Log Group for Lambda
   LambdaLogGroup:
