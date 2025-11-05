@@ -18,8 +18,7 @@ Metadata:
         default: "Amazon Connect CloudWatch LogGroup"
       AmazonS3ForReports:
         default: "Amazon S3 bucket ARN"
-      
-
+        
 Parameters:
   AmazonConnectInstanceARN:
     Type: String
@@ -27,15 +26,14 @@ Parameters:
   
   AmazonConnectCloudWatchLogGroup:
     Type: String
-    Description: 'The ARN of your Amazon Connect instance's CloudWatch Log Group resource. Example: /aws/connect/connect-instance-name'
-
+    Description: 'The ARN of your Amazon Connect instance CloudWatch Log Group resource. Example: /aws/connect/connect-instance-name'
+  
   AmazonS3ForReports:
     Type: String
     Description: 'Existing S3 Bucket ARN for uploading Operational review reports'
     MinLength: 3
     MaxLength: 63
     ConstraintDescription: 'Must be a valid S3 bucket name'
-
 
 Resources:
   # IAM Role for Lambda execution with required permissions
